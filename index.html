@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Flashcard Master</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <i class="fas fa-brain header-icon"></i>
+                <h1>Flashcard Master</h1>
+                <p>Create, study, and master your knowledge with ease</p>
+            </div>
+
+            <div id="homeView" class="view active">
+                <div class="text-center mb-2">
+                    <button
+                        class="btn btn-primary"
+                        onclick="app.createNewDeck()"
+                    >
+                        <i class="fas fa-plus"></i> Create New Deck
+                    </button>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="app.importDeck()"
+                    >
+                        <i class="fas fa-file-import"></i> Import from CSV
+                    </button>
+                </div>
+                <div id="decksList" class="deck-grid"></div>
+            </div>
+
+            <div id="editView" class="view">
+                <div class="edit-container">
+                    <button
+                        class="btn btn-secondary back-btn"
+                        onclick="app.backToHome()"
+                    >
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    <div class="form-group">
+                        <label><i class="fas fa-heading"></i> Deck Title</label>
+                        <input
+                            type="text"
+                            id="deckTitle"
+                            placeholder="Enter deck title"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label
+                            ><i class="fas fa-align-left"></i> Description
+                            (optional)</label
+                        >
+                        <textarea
+                            id="deckDescription"
+                            rows="2"
+                            placeholder="Enter description"
+                        ></textarea>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h3><i class="fas fa-layer-group"></i> Cards</h3>
+                        <button
+                            class="btn btn-primary btn-small"
+                            onclick="app.addCard()"
+                        >
+                            <i class="fas fa-plus"></i> Add Card
+                        </button>
+                    </div>
+                    <div id="cardsList"></div>
+                    <div class="action-buttons mt-2">
+                        <button
+                            class="btn btn-success"
+                            onclick="app.saveDeck()"
+                        >
+                            <i class="fas fa-save"></i> Save Deck
+                        </button>
+                        <button
+                            class="btn btn-secondary"
+                            onclick="app.exportCurrentDeck()"
+                        >
+                            <i class="fas fa-download"></i> Export as CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flashcardView" class="view">
+                <div class="flashcard-container">
+                    <button
+                        class="btn btn-secondary back-btn"
+                        onclick="app.backToHome()"
+                    >
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    <div class="flashcard-controls">
+                        <div class="progress-text" id="flashcardProgress">
+                            0 / 0
+                        </div>
+                        <div class="toggle-group">
+                            <button
+                                class="toggle-btn active"
+                                id="termFirstBtn"
+                                onclick="app.setFlashcardMode('term')"
+                            >
+                                <i class="fas fa-book"></i> Term First
+                            </button>
+                            <button
+                                class="toggle-btn"
+                                id="defFirstBtn"
+                                onclick="app.setFlashcardMode('definition')"
+                            >
+                                <i class="fas fa-lightbulb"></i> Definition
+                                First
+                            </button>
+                        </div>
+                        <button
+                            class="btn btn-secondary btn-small"
+                            onclick="app.shuffleFlashcards()"
+                        >
+                            <i class="fas fa-random"></i> Shuffle
+                        </button>
+                    </div>
+                    <div
+                        class="flashcard"
+                        id="flashcard"
+                        onclick="app.flipCard()"
+                    >
+                        <div
+                            class="flashcard-content"
+                            id="flashcardFront"
+                        ></div>
+                        <div class="flashcard-back">
+                            <div
+                                class="flashcard-content"
+                                id="flashcardBack"
+                            ></div>
+                        </div>
+                    </div>
+                    <div class="flashcard-actions">
+                        <button
+                            class="btn btn-danger"
+                            onclick="app.markCard(false)"
+                        >
+                            <i class="fas fa-times-circle"></i> Still Learning
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            onclick="app.markCard(true)"
+                        >
+                            <i class="fas fa-check-circle"></i> Know It
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="learnView" class="view">
+                <div class="learn-container">
+                    <button
+                        class="btn btn-secondary back-btn"
+                        onclick="app.backToHome()"
+                    >
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            id="learnProgress"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                    <div class="progress-text mb-2" id="learnProgressText">
+                        0 of 0 answered
+                    </div>
+                    <div id="learnContent"></div>
+                </div>
+            </div>
+
+            <div id="testView" class="view">
+                <div class="test-container">
+                    <button
+                        class="btn btn-secondary back-btn"
+                        onclick="app.backToHome()"
+                    >
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    <div id="testContent"></div>
+                </div>
+            </div>
+
+            <div id="cramView" class="view">
+                <div class="cram-container">
+                    <button
+                        class="btn btn-secondary back-btn"
+                        onclick="app.backToHome()"
+                    >
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            id="cramProgress"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                    <div id="cramContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <input
+            type="file"
+            id="fileInput"
+            class="file-input"
+            accept=".csv"
+            onchange="app.handleFileImport(event)"
+        />
+
+        <script src="app.js"></script>
+    </body>
+</html>
