@@ -21,33 +21,41 @@ function TestMode() {
     useEffect(() => {
         if (!deck || !deck.cards || deck.cards.length < 4) return
 
+        // Shuffle all cards first
         const shuffled = [...deck.cards].sort(() => Math.random() - 0.5)
-        const testQuestions = shuffled.slice(0, Math.min(10, deck.cards.length)).map((card, idx) => {
-            const isMCQ = idx % 2 === 0
+        
+        // Take up to 10 cards
+        const selectedCards = shuffled.slice(0, Math.min(10, deck.cards.length))
+        
+        // Randomly assign MCQ or Written to each card
+        const testQuestions = selectedCards.map((card, idx) => {
+            // Random boolean for MCQ vs Written (50/50 chance)
+            const isMCQ = Math.random() < 0.5
 
             if (isMCQ) {
-                // FIX: Use card.front instead of card.id to filter unique wrong options
+                // MCQ: Word → Meaning (original way)
                 const wrongOptions = deck.cards
                     .filter(c => c.front !== card.front)
                     .sort(() => Math.random() - 0.5)
                     .slice(0, 3)
-                    .map(c => c.back)
+                    .map(c => c.back) // Wrong meanings
 
                 const options = [...wrongOptions, card.back].sort(() => Math.random() - 0.5)
 
                 return {
-                    id: `${card.id}-${idx}`, // Make unique ID for each question
+                    id: `${card.id}-${idx}-${Date.now()}`,
                     type: 'mcq',
-                    question: card.front,
-                    correctAnswer: card.back,
+                    question: card.front, // Show WORD
+                    correctAnswer: card.back, // MEANING is answer
                     options
                 }
             } else {
+                // Written: Meaning → Word (reversed)
                 return {
-                    id: `${card.id}-${idx}`, // Make unique ID for each question
+                    id: `${card.id}-${idx}-${Date.now()}`,
                     type: 'written',
-                    question: card.front,
-                    correctAnswer: card.back
+                    question: card.back, // Show MEANING
+                    correctAnswer: card.front // WORD is answer
                 }
             }
         })
@@ -106,12 +114,15 @@ function TestMode() {
     }
 
     const handleRestart = () => {
-        // Regenerate test
+        // Regenerate test with new randomization
         const shuffled = [...deck.cards].sort(() => Math.random() - 0.5)
-        const testQuestions = shuffled.slice(0, Math.min(10, deck.cards.length)).map((card, idx) => {
-            const isMCQ = idx % 2 === 0
+        const selectedCards = shuffled.slice(0, Math.min(10, deck.cards.length))
+        
+        const testQuestions = selectedCards.map((card, idx) => {
+            const isMCQ = Math.random() < 0.5
 
             if (isMCQ) {
+                // MCQ: Word → Meaning
                 const wrongOptions = deck.cards
                     .filter(c => c.front !== card.front)
                     .sort(() => Math.random() - 0.5)
@@ -121,18 +132,19 @@ function TestMode() {
                 const options = [...wrongOptions, card.back].sort(() => Math.random() - 0.5)
 
                 return {
-                    id: `${card.id}-${idx}`,
+                    id: `${card.id}-${idx}-${Date.now()}`,
                     type: 'mcq',
-                    question: card.front,
-                    correctAnswer: card.back,
+                    question: card.front, // WORD
+                    correctAnswer: card.back, // MEANING
                     options
                 }
             } else {
+                // Written: Meaning → Word
                 return {
-                    id: `${card.id}-${idx}`,
+                    id: `${card.id}-${idx}-${Date.now()}`,
                     type: 'written',
-                    question: card.front,
-                    correctAnswer: card.back
+                    question: card.back, // MEANING
+                    correctAnswer: card.front // WORD
                 }
             }
         })
@@ -183,10 +195,13 @@ function TestMode() {
                                                     {isCorrect ? <Check size={16} className="text-green-600" /> : <X size={16} className="text-red-600" />}
                                                 </div>
                                                 <div className="flex-1">
+                                                    <p className="text-xs font-semibold text-indigo-600 uppercase mb-1">
+                                                        {q.type === 'mcq' ? 'Multiple Choice' : 'Written Answer'}
+                                                    </p>
                                                     <p className="font-medium text-gray-900 mb-2">{idx + 1}. {q.question}</p>
-                                                    <p className="text-sm text-gray-600 mb-1">Your answer: <span className={isCorrect ? 'text-green-600' : 'text-red-600'}>{userAnswer || '(no answer)'}</span></p>
+                                                    <p className="text-sm text-gray-600 mb-1">Your answer: <span className={isCorrect ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>{userAnswer || '(no answer)'}</span></p>
                                                     {!isCorrect && (
-                                                        <p className="text-sm text-gray-600">Correct answer: <span className="text-green-600">{q.correctAnswer}</span></p>
+                                                        <p className="text-sm text-gray-600">Correct answer: <span className="text-green-600 font-medium">{q.correctAnswer}</span></p>
                                                     )}
                                                 </div>
                                             </div>
