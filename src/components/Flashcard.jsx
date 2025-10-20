@@ -14,9 +14,6 @@ function Flashcard({ card, isFlipped, onFlip }) {
                 style={{ backfaceVisibility: "hidden" }}
             >
                 <div className="text-center">
-                    <div className="text-sm font-semibold text-indigo-600 mb-4">
-                        FRONT
-                    </div>
                     <p className="text-2xl font-medium text-gray-900">
                         {card.front}
                     </p>
@@ -31,9 +28,6 @@ function Flashcard({ card, isFlipped, onFlip }) {
                 }}
             >
                 <div className="text-center">
-                    <div className="text-sm font-semibold text-white/80 mb-4">
-                        BACK
-                    </div>
                     <p className="text-2xl font-medium text-white">
                         {card.back}
                     </p>
